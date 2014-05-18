@@ -9,11 +9,15 @@ Our CPE library allows multiple threads to block until a global condition is sat
 
 Our work is based on [this paper](https://www.usenix.org/system/files/conference/hotpar12/hotpar12-final54.pdf, "CPE Paper") by Gottschlich, Pokam, and Pereira of Intel. Building upon the original authors' work, we hope to make the following improvements: 
 
-*   Reduced verbosity & increased organization of testing code
+*   Improved organization & reduced verbosity of testing code
 *   Stricter, barrier-like guarantees for condition satisfaction & thread release
 *   Reduced wait times when condition not immediately satisfied
 
+__Improved Organization__: The authors' paper requires creation of objects containing state and method calls with several arguments when testing predicates. In contrast, our implementation only requires one line of code per class file to configure state and the method call __checkpoint(checkpointName)__ when testing predicates. This is due to our organization and the reflection facilities available in Java. A YAML config file specifies a list of Checkpoint names - each Checkpoint is akin to a test case or bug to replicate. Each Checkpoint has multiple Contexts, each Context specifies a different function to be called to check for satisfaction based on the calling class. These functions are housed in separate test files as one would normally write unit tests. 
 
+__Stricter Guarantees__: Our code ensures that conditions are not only true for the minimum number of threads, but that conditions are true __at the same time__ and that all satisfied threads __resume execution at the same time__. In contrast, the authors' code would individually release threads once a certain number of threads had separately satisfied the condition. 
+
+__Reduced Wait Times__: 
 
 
 __GlobalState.java__
