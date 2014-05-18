@@ -1,0 +1,24 @@
+---
+checkpoint1:
+  testClassName: com.myorg.tests.Checkpoint1
+  numRequired: 3
+  contexts:
+    A:
+      timeoutMS: 1000
+      retriesCheck: 5
+      retriesSync: 10
+      methodName: testContextA
+checkpoint2:
+  testClassName: com.myorg.tests.Checkpoint2
+  numRequired: 5
+  contexts:
+    B:
+      timeoutMS: 1000
+      retriesCheck: 5
+      retriesSync: 10
+      methodName: testContextB
+    C:
+      timeoutMS: 2000
+      retriesCheck: 10
+      retriesSync: 20
+      methodName: testContextC
