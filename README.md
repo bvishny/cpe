@@ -1,6 +1,21 @@
 CPE: Concurrent, Blocking Assertions
 ===
 
+__Authors__: Benjamin Vishny and Liam Elberty
+
+Ever struggled to replicate bugs in concurrent programs? Coordinating the execution of multiple threads is the only way to replicate most concurrent bugs, yet few tools exist to do this. 
+
+Our CPE library allows multiple threads to block until a global condition is satisfied, then simultaneously resume execution. It is a hybrid between a barrier and an assertion. All calling threads will wait until a condition is locally satisfied in some required number of threads, or a timeout is reached. The method call returns __true__ if conditions are satisfied and __false__ if the timeout is reached. This allows outcome-specific code to be run. 
+
+Our work is based on [this paper](https://www.usenix.org/system/files/conference/hotpar12/hotpar12-final54.pdf, "CPE Paper") by Gottschlich, Pokam, and Pereira of Intel. Building upon the original authors' work, we hope to make the following improvements: 
+
+*   Reduced verbosity & increased organization of testing code
+*   Stricter, barrier-like guarantees for condition satisfaction & thread release
+*   Reduced wait times when condition not immediately satisfied
+
+
+
+
 __GlobalState.java__
 
     package cpesample;
@@ -12,7 +27,7 @@ __GlobalState.java__
         public GlobalState() {
             this.isInconsistentState = false;
             // Allocate up to 5 MB temporary buffer
-            this.bbuf = ByteBuffer.allocate(5 * 1024 * 1024);
+            this.temporaryBuffer = ByteBuffer.allocate(5 * 1024 * 1024);
         }
 
         public byte[] loadDataFromRemoteResource(String resourceName) {
