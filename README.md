@@ -1,4 +1,6 @@
-[intro] CPE: Concurrent, Blocking Assertions
+[intro]: Intro
+
+CPE: Concurrent, Blocking Assertions
 ===
 
 __Authors__: Benjamin Vishny and Liam Elberty
@@ -24,7 +26,8 @@ __Stricter Guarantees__: Our code ensures that conditions are not only locally s
 __Reduced Wait Times__: Like the original paper, we recheck conditions in each thread until a maximum number of tries or a timeout is reached. Whereas the paper asks the user to specify the backoff time, our code is designed for situations where the time required to create a condition is unpredictable, such as an operation over a network. Rather, we retry every time a new thread calls 'checkpoint', so as to retry as soon as possible without requiring users to speculate about timing. This is based on the assumption that all threads capable of altering state examined by the test will call 'checkpoint'.
 
 
-[example] Example
+[example]: Example
+Example
 ===
 
 Our CPE library thrives in situations where the time to replication is unpredictable. In this example, two threads - threadA and threadB - both download data over a network and write to a shared buffer. They then output the data downloaded. If one thread reads while the other writes a race will occur. However due to the differences in network request time, their actions are unlikely to overlap and the bug is difficult to replicate. We block both so they write to the shared buffer simultaneously, thus replicating the bug. 
@@ -170,8 +173,8 @@ __Runner.java__
         }
     }
 
-
-[thanks] Special Thanks
+[thanks]: Special Thanks
+Special Thanks
 ===
 Special thanks to:
 
