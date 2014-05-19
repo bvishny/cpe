@@ -7,6 +7,7 @@ __Authors__: Benjamin Vishny and Liam Elberty
 
 * [Intro][intro]
 * [Example][example]
+* [Internals][internals]
 * [Special Thanks][thanks]
 
 Ever struggled to replicate bugs in concurrent programs? Coordinating and timing the execution of multiple threads is the only way to replicate most concurrent bugs, yet few tools exist to do this. 
@@ -172,6 +173,21 @@ __Runner.java__
             b.join();
         }
     }
+
+[internals]: Internals
+Internals
+===
+When 'checkpoint' is called, two 'phases' are run to ensure conditions are simultaneously satisfied and remain so before release.
+
+__Check Phase__: Each thread individually checks for local satisfaction by passing a Java Object representing its state into a boolean function defined in a test file. Note that threads check one at a time in this phase. If the condition is locally satisfied, it moves on. Otherwise, it retries the next time a new thread calls 'checkpoint' until either the timeout or number of retries specific to the Check Phase are exceeded. If a timeout or retry limit is exceeded, checkpoint immediately returns false.
+
+__Sync Phase__: All threads that have previously locally satisfied the condition recheck the condition to ensure that state has not changed since the Check Phase and that all threads are in agreement. The use of a Cyclic Barrier before the Sync Phase ensures that no thread will be able to recheck a condition until at least the required number of threads is in the Sync Phase and individual threads cannot execute any outside code. This maximizes the chances of concurrent agreement. A Cyclic Barrier was chosen because if less than the required number of threads are locally satisfied in the Sync Phase they will retry until the Sync Phase-specific retry limit is exceeded or the overall timeout is hit. Seperate retry settings are provided for the Sync Phase because once a thread enters the sync phase it is likely to end up satisfied even if it failed the recheck due to outside interference at some point. 
+
+Once all threads have performed a recheck and the checkpoint is globally satisfied, a second barrier is used to ensure that they exit the checkpoint simultaneously. 
+
+__Condition Checking__: Each 'checkpoint' call is aware of a 'Context' for the thread calling it, that is some Java Object enscapulating local state, and the classpath plus name of a function that can check the condition given this Object. The classpath and method name are embedded in the YAML file. Reflection is used to to invoke the method on the Object and get a boolean result. 
+
+__Thread Awareness__: A separate Condition variable and Reentrant lock are used for each Checkpoint so all waiting threads for a given checkpoint can be signalled when a new thread enters. 
 
 [thanks]: Thanks
 Special Thanks
