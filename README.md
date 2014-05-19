@@ -3,21 +3,21 @@ CPE: Concurrent, Blocking Assertions
 
 __Authors__: Benjamin Vishny and Liam Elberty
 
-Ever struggled to replicate bugs in concurrent programs? Coordinating the execution of multiple threads is the only way to replicate most concurrent bugs, yet few tools exist to do this. 
+Ever struggled to replicate bugs in concurrent programs? Coordinating and timing the execution of multiple threads is the only way to replicate most concurrent bugs, yet few tools exist to do this. 
 
-Our CPE library allows multiple threads to block until a global condition is satisfied, then simultaneously resume execution. It is a hybrid between a barrier and an assertion. All calling threads will wait until a condition is locally satisfied in some required number of threads, or a timeout is reached. The method call returns __true__ if conditions are satisfied and __false__ if the timeout is reached. This allows outcome-specific code to be run. 
+Our CPE library allows users to block execution of multiple threads until a global condition is satisfied. Upon satisfaction, all threads are simultaneously released. It is a hybrid between a barrier and an assertion. All calling threads will block until a condition is locally satisfied in some required number of threads, or timeouts/retries are exhausted. The method call returns a boolean indicating whether conditions were satisfied or the call was prematurely ended. This allows outcome-specific code to be run. 
 
 Our work is based on [this paper](https://www.usenix.org/system/files/conference/hotpar12/hotpar12-final54.pdf, "CPE Paper") by Gottschlich, Pokam, and Pereira of Intel. Building upon the original authors' work, we hope to make the following improvements: 
 
-*   Improved organization & reduced verbosity of testing code
-*   Stricter, barrier-like guarantees for condition satisfaction & thread release
+*   Improved organization and reduced verbosity of testing code
+*   Stricter, barrier-like guarantees for condition satisfaction and thread release
 *   Reduced wait times when condition not immediately satisfied
 
-__Improved Organization__: As the authors' paper is implemented in C, it requires creation of objects containing state and method calls with several arguments when testing predicates. In contrast, our implementation only requires one line of code per class file to configure state and the method call __checkpoint(checkpointName)__ when testing predicates. This is due to our organization and the reflection facilities available in Java. A YAML config file specifies a list of __Checkpoint__ names - each Checkpoint is akin to a test case or bug to replicate. Each Checkpoint has multiple Contexts, each __Context__ specifies a different function to be called to check for satisfaction based on the calling class. These functions are housed in separate test files as one would normally write unit tests. 
+__Improved Organization__: As the authors' paper is implemented in C, it requires creation of an object containing application state for every CPE method call. In contrast, our implementation only requires one line of code per class file to configure state and the method call __checkpoint(checkpointName)__ when testing predicates. This is due to our organization and the reflection facilities available in Java. A YAML config file specifies a list of __Checkpoint__ names - each Checkpoint is akin to a test case or bug to replicate. Each Checkpoint has multiple Contexts, each __Context__ specifies a different function to be called to check for satisfaction based on the calling class. These functions are housed in separate test files as one would normally write unit tests. 
 
-__Stricter Guarantees__: Our code ensures that conditions are not only true for the minimum number of threads, but that conditions are true __at the same time__ and that all satisfied threads __resume execution at the same time__. In contrast, the authors' code would individually release threads once a certain number of threads had separately satisfied the condition. 
+__Stricter Guarantees__: Our code ensures that conditions are not only locally satisfied in the minimum number of threads, but also synchronizes condition checking to ensure that conditions are true __at the same time__. Further we guarantee that satisfied threads __resume execution at the same time__. In contrast, the authors' code would individually release threads once a certain number of threads had separately satisfied the condition. 
 
-__Reduced Wait Times__: Like the original paper, we recheck conditions in each thread until a maximum number of tries or a timeout is reached. Whereas the paper asks the user to specify the backoff time, our code is designed for situations where the time required to create a condition is unpredictable, such as an operation over a network. Rather, we retry every time a new thread calls __checkpoint__, so as to retry as soon as possible without requiring users to speculate about timing. 
+__Reduced Wait Times__: Like the original paper, we recheck conditions in each thread until a maximum number of tries or a timeout is reached. Whereas the paper asks the user to specify the backoff time, our code is designed for situations where the time required to create a condition is unpredictable, such as an operation over a network. Rather, we retry every time a new thread calls __checkpoint__, so as to retry as soon as possible without requiring users to speculate about timing. This is based on the assumption that all threads capable of altering state examined by the test will call 'checkpoint'.
 
 
 Example
@@ -138,3 +138,13 @@ __CPETests.java__
             return ((GlobalState) state.gs).isInconsistentState;
         }
     }
+
+
+
+Special Thanks
+===
+Special thanks to:
+
+* [Professor Maurice Herlihy](http://cs.brown.edu/~mph/, "Maurice Herligy") of Brown University
+* Justin E. Gottschlich, Gilles A. Pokam, and Cristiano L. Pereira of Intel for their work on the original paper
+* The maintainers of [SnakeYAML](https://code.google.com/p/snakeyaml/, "SnakeYAML") which we use to parse YAML. SnakeYAML is licensed under the Apache 2.0 License.
