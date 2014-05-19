@@ -173,7 +173,7 @@ __Runner.java__
         }
     }
 
-[thanks]: Special Thanks
+[thanks]: Thanks
 Special Thanks
 ===
 Special thanks to:
