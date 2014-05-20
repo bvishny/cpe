@@ -187,7 +187,7 @@ Once all threads have performed a recheck and the checkpoint is globally satisfi
 
 __Condition Checking__: Each 'checkpoint' call is aware of a 'Context' for the thread calling it, that is some Java Object enscapulating local state, and the classpath plus name of a function that can check the condition given this Object. The classpath and method name are embedded in the YAML file. Reflection is used to to invoke the method on the Object and get a boolean result. 
 
-__Thread Awareness__: A separate Condition variable and Reentrant lock are used for each Checkpoint so all waiting threads for a given checkpoint can be signalled when a new thread enters. 
+__Thread Awareness__: A separate Condition variable and Reentrant lock are used for each Checkpoint so all waiting threads for a given checkpoint can be signalled when a new thread enters. Since a signal indicates a retry should occur, not necessarily that the condition is true, the problem of false wakeups need not be handled. 
 
 [thanks]: Thanks
 Special Thanks
