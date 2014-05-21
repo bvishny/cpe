@@ -5,10 +5,10 @@ CPE: Concurrent, Blocking Assertions
 
 __Authors__: Benjamin Vishny and Liam Elberty
 
-* [Intro][intro]
-* [Example][example]
-* [Internals][internals]
-* [Special Thanks][thanks]
+* [Intro](#intro)
+* [Example](#example)
+* [Internals](#internals)
+* [Special Thanks](#thanks)
 
 Ever struggled to replicate bugs in concurrent programs? Coordinating and timing the execution of multiple threads is the only way to replicate most concurrent bugs, yet few tools exist to do this. 
 
