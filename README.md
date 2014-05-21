@@ -1,4 +1,4 @@
-[intro]: Intro
+<a name="intro"></a>
 
 CPE: Concurrent, Blocking Assertions
 ===
@@ -27,7 +27,7 @@ __Stricter Guarantees__: Our code ensures that conditions are not only locally s
 __Reduced Wait Times__: Like the original paper, we recheck conditions in each thread until a maximum number of tries or a timeout is reached. Whereas the paper asks the user to specify the backoff time, our code is designed for situations where the time required to create a condition is unpredictable, such as an operation over a network. Rather, we retry every time a new thread calls 'checkpoint', so as to retry as soon as possible without requiring users to speculate about timing. This is based on the assumption that all threads capable of altering state examined by the test will call 'checkpoint'.
 
 
-[example]: Example
+<a name="example"></a>
 Example
 ===
 
@@ -174,7 +174,7 @@ __Runner.java__
         }
     }
 
-[internals]: #internals
+<a name="internals"></a>
 Internals
 ===
 When 'checkpoint' is called, two 'phases' are run to ensure conditions are simultaneously satisfied and remain so before release.
@@ -189,7 +189,7 @@ __Condition Checking__: Each 'checkpoint' call is aware of a 'Context' for the t
 
 __Thread Awareness__: A separate Condition variable and Reentrant lock are used for each Checkpoint so all waiting threads for a given checkpoint can be signalled when a new thread enters. Since a signal indicates a retry should occur, not necessarily that the condition is true, the problem of false wakeups need not be handled. 
 
-[thanks]: Thanks
+<a name="thanks"></a>
 Special Thanks
 ===
 Special thanks to:
